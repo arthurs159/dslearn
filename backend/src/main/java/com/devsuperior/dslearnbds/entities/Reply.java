@@ -2,6 +2,8 @@ package com.devsuperior.dslearnbds.entities;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,41 +11,50 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tb_notification")
-public class Notification implements Serializable{
+@Table(name = "tb_reply")
+public class Reply implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String text;
-	
+
+	@Column(columnDefinition = "TEXT")
+	private String body;
+
 	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
 	private Instant moment;
-	
-	private boolean read;
-	private String route;
-	
+
 	@ManyToOne
-	@JoinColumn(name = "user_id")
-	private User user;
+	@JoinColumn(name = "topic_id")
+	private Topic topic;
+
+	@ManyToOne
+	@JoinColumn(name = "author_id")
+	private User author;
 	
-	public Notification() {
-		
+	@ManyToMany
+	@JoinTable(name = "tb_reply_likes",
+				joinColumns = @JoinColumn(name = "reply_id"),
+				inverseJoinColumns = @JoinColumn(name = "user_id")
+	)
+	private Set<User> likes = new HashSet<>();
+	
+	public Reply() {
+
 	}
 
-	public Notification(Long id, String text, Instant moment, Boolean read, String route, User user) {
+	public Reply(Long id, String body, Instant moment) {
 		this.id = id;
-		this.text = text;
+		this.body = body;
 		this.moment = moment;
-		this.read = read;
-		this.route = route;
-		this.user = user;
 	}
 
 	public Long getId() {
@@ -54,12 +65,12 @@ public class Notification implements Serializable{
 		this.id = id;
 	}
 
-	public String getText() {
-		return text;
+	public String getBody() {
+		return body;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setBody(String body) {
+		this.body = body;
 	}
 
 	public Instant getMoment() {
@@ -70,30 +81,6 @@ public class Notification implements Serializable{
 		this.moment = moment;
 	}
 
-	public Boolean getRead() {
-		return read;
-	}
-
-	public void setRead(Boolean read) {
-		this.read = read;
-	}
-
-	public String getRoute() {
-		return route;
-	}
-
-	public void setRoute(String route) {
-		this.route = route;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -110,7 +97,7 @@ public class Notification implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Notification other = (Notification) obj;
+		Reply other = (Reply) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -118,5 +105,5 @@ public class Notification implements Serializable{
 			return false;
 		return true;
 	}
-	
+
 }
